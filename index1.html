@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>نبذة عني</title>
+  <style>
+    :root{
+      --bg:#0e0f12;
+      --text:#e6e6e6;
+      --muted:#a8b0bd;
+      --primary:#28ff5a; /* نفس أخضر الهالة اللي بالصورة */
+    }
+    *{box-sizing:border-box; ::selection{color: yellow; background: #050607;}}
+    body{
+      margin:0; padding:0;
+      background: radial-gradient(1200px 600px at 50% 30%, #111 0%, #0b0c0f 50%, #050607 100%);
+      color:var(--text); font-family: "Cairo", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      line-height:1.7;
+    }
+    .about{
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      padding:48px 20px;
+    }
+    .card{
+      width:min(1100px, 95vw);
+      display:flex; gap:40px; align-items:center;
+      background: rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:24px; padding:32px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      overflow:hidden;
+      opacity:0; transform: translateY(24px) scale(.98);
+      transition: .8s ease;
+    }
+    .card.show{ opacity:1; transform: translateY(0) scale(1); }
+
+    .avatar{
+      position:relative; width:260px; height:260px; flex:0 0 auto;
+      border-radius:50%;
+      overflow:hidden;
+      display:grid; place-items:center;
+      border:2px solid rgba(40,255,90,.6);
+      box-shadow:
+        0 0 0 4px rgba(40,255,90,.08) inset,
+        0 0 24px rgba(40,255,90,.35),
+        0 10px 30px rgba(0,0,0,.5);
+      background: radial-gradient(60% 60% at 50% 45%, rgba(40,255,90,.15), transparent 70%);
+    }
+    .avatar img{
+      width:115%; height:auto; object-fit:cover;
+      filter: drop-shadow(0 14px 18px rgba(0,0,0,.55));
+      transform: translateY(4px);
+      user-select:none; pointer-events:none;
+    }
+    .content{flex:1 1 520px}
+    .eyebrow{
+      font-size:.9rem; letter-spacing:.08em; color:var(--primary);
+      text-transform:uppercase; font-weight:700; opacity:.9
+    }
+    h1{ margin:.2em 0 .4em; font-size:clamp(1.6rem, 1rem + 2.2vw, 2.6rem); line-height:1.25 }
+    p{ color:var(--muted); margin:0 0 18px }
+    .typing{
+      font-weight:700; white-space:nowrap; display:inline-block; position:relative
+    }
+    .caret{
+      display:inline-block; width:10px; margin-right:2px;
+      border-right:3px solid var(--primary);
+      animation: blink 1s steps(1) infinite;
+      vertical-align:-3px; height:1.2em;
+    }
+    @keyframes blink { 50%{ border-color: transparent } }
+
+    .badges{ display:flex; flex-wrap:wrap; gap:10px; margin-top:14px }
+    .badge{
+      padding:6px 10px; border-radius:999px; font-size:.9rem;
+      background: rgba(40,255,90,.08); border:1px solid rgba(40,255,90,.25);
+      color:#dfffe9
+    }
+
+    @media (max-width:840px){
+      .card{ flex-direction:column; text-align:center }
+      .avatar{ width:220px; height:220px }
+      .badges{ justify-content:center }
+    }
+  </style>
+</head>
+<body>
+
+<section class="about">
+  <div class="card" id="aboutCard">
+    <div class="avatar">
+      <!-- حط مسار صورتك هنا -->
+      <img id="Photo" src="web.png" alt="Enter your Photo">
+    </div>
+
+    <div class="content">
+      <div class="eyebrow">Quick overview</div>
+      <h1>
+        my name is: —
+        <span class="typing" id="typing"></span><span class="caret"></span>
+      </h1>
+
+      <p>
+        Description
+      </p>
+
+      <div class="badges">
+        <span class="badge">Front-End</span>
+        <span class="badge">Cybersecurity</span>
+        <span class="badge">C / C++</span>
+        <span class="badge">Python</span>
+        <span class="badge">Bash</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// document.getElementById("Photo").alt=;
+/* ====== أنيميشن الكتابة (Typing) ====== */
+(function(){
+  const phrases = [
+    "front_end web Developer",
+    "design",
+    "learned",
+    "photoshop"
+  ];
+  const el = document.getElementById("typing");
+  const speed = 55;       // سرعة الكتابة
+  const hold  = 900;      // وقت التوقف بعد انتهاء السطر
+  const erase = 35;       // سرعة المسح
+
+  let i = 0, j = 0, typing = true;
+
+  function loop(){
+    const current = phrases[i];
+
+    if(typing){
+      el.textContent = current.slice(0, ++j);
+      if(j === current.length){ typing = false; setTimeout(loop, hold); return; }
+      setTimeout(loop, speed);
+    }else{
+      el.textContent = current.slice(0, --j);
+      if(j === 0){ typing = true; i = (i+1) % phrases.length; setTimeout(loop, 350); return; }
+      setTimeout(loop, erase);
+    }
+  }
+  loop();
+})();
+
+/* ====== إظهار الكارت بسلاسة عند الظهور ====== */
+(function(){
+  const card = document.getElementById("aboutCard");
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ card.classList.add("show"); io.disconnect(); }
+    });
+  }, {threshold:.25});
+  io.observe(card);
+})();
+</script>
+
+</body>
+</html>
